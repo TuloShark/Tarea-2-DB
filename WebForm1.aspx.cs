@@ -18,52 +18,39 @@ namespace Usuario
 
         }
 
-        protected void Button1_Click(object sender, EventArgs e)
+        protected void Button1_Click(object sender, EventArgs e) // Accion al aceptar en el FORM
         {
             string mainconn = @"Data Source=database-segunda.csuvznav9scq.us-east-1.rds.amazonaws.com,1433;
                                 Initial Catalog=aaronWander;
                                 User ID=admin;
-                                Password=Wanderjose2";
+                                Password=Wanderjose2"; // Se establece conexion con la BD
 
             SqlConnection sqlconn = new SqlConnection(mainconn);
-
-            /* SqlCommand sqlcomm = new SqlCommand("[dbo].[listar_articulos]", sqlconn);
-            sqlcomm.CommandType = CommandType.StoredProcedure; */
-
             sqlconn.Open();
-
-            string checkuser = "SELECT count(*) FROM dbo.Usuario WHERE UserName='" + Nombre.Text + "'";
+            string checkuser = "SELECT count(*) FROM dbo.Usuario WHERE UserName='" + Nombre.Text + "'"; // Se selecciona el usuario con el userName
             SqlCommand sqlcomm = new SqlCommand(checkuser, sqlconn);
             int temp = Convert.ToInt32(sqlcomm.ExecuteScalar().ToString());
             sqlconn.Close();
 
-            if (temp == 1)
+            if (temp == 1) // Si el usuario existe
             {
                 sqlconn.Open();
-                string checkpassword = "SELECT Password FROM dbo.Usuario WHERE UserName='" + Nombre.Text + "'";
+                string checkpassword = "SELECT Password FROM dbo.Usuario WHERE UserName='" + Nombre.Text + "'"; // Se obtiene el password de la BD
                 SqlCommand sqlpasscomm = new SqlCommand(checkpassword, sqlconn);
                 string password = sqlpasscomm.ExecuteScalar().ToString().Replace(" ", "");
-                if (password == Contrasena.Text)
+                if (password == Contrasena.Text) // Si la password colocada y la de la BD es igual
                 {
-                    Session["New"] = Nombre.Text;
-                    Response.Write("Bienvenido");
+                    Response.Redirect("WebForm2.aspx"); // Me redirige a la pagina inicial
                 }
                 else
                 {
-                    Response.Write("Combinación de usuario / password no existe en la BD");
+                    Response.Write("Combinación de usuario / password no existe en la BD"); // Si no es igual no me deja avanzar
                 }
             }
             else
             {
                 Response.Write("Combinación de usuario / password no existe en la BD");
             }
-
-            /* SqlDataAdapter sda = new SqlDataAdapter(sqlcomm);
-            DataTable dt = new DataTable();
-            sda.Fill(dt);
-            gridArticulos.DataSource = dt;
-            gridArticulos.DataBind(); */
         }
-
     }
 }

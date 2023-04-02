@@ -8,8 +8,8 @@
     <title></title>
     <style type="text/css">
         .auto-style1 {
-            height: 226px;
-            width: 511px;
+            height: 218px;
+            width: 504px;
             background-color: #FFFFFF;
         }
         .auto-style2 {
@@ -36,7 +36,7 @@
 </head>
 <body style="height: 226px; width: 511px">
     <form id="form1" runat="server">
-        <div class="auto-style1">
+        <div class="auto-style1" style="border-style: solid; border-width: thin">
             <strong><span class="auto-style5">&nbsp;USER NAME : </span></strong>
             <asp:TextBox ID="Nombre" runat="server" CssClass="auto-style3" Width="250px"></asp:TextBox>
 &nbsp;&nbsp;
