@@ -3,152 +3,153 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Text.RegularExpressions;
 
-public partial class _Default : System.Web.UI.Page
+namespace Usuario
 {
-    protected void Page_Load(object sender, EventArgs e)
+    public partial class WebForm2 : System.Web.UI.Page
     {
-        if (DdClaseList.Items.Count!=3)
-            cargarClaseArticulos();
-        string cantidad = Request.QueryString["cantidad"];
-        if (cantidad != null)
-            listarTabla(cantidad, 1);
-        else
+        string Usuario = "Adam"; //Un usuario de prueba para comprobar el funcionamiento de eventlog
+        protected void Page_Load(object sender, EventArgs e)
         {
-            cantidad = Request.QueryString["nombre"];
+            if (DdClaseList.Items.Count != 3)
+                cargarClaseArticulos();
+            string cantidad = Request.QueryString["cantidad"];
+            //Usuario = Request.QueryString["usuario"]; trata de obetener el username del usuario
             if (cantidad != null)
-                listarTabla(cantidad, 0);
+                listarTabla(cantidad, 1);
             else
             {
-                cantidad = Request.QueryString["clase"];
+                cantidad = Request.QueryString["nombre"];
                 if (cantidad != null)
-                    listarTabla(cantidad, 2);
+                    listarTabla(cantidad, 0);
                 else
                 {
-                    listarTabla(cantidad, 3);
+                    cantidad = Request.QueryString["clase"];
+                    if (cantidad != null)
+                        listarTabla(cantidad, 2);
+                    else
+                    {
+                        listarTabla(cantidad, 3);
+                    }
                 }
             }
-        }
-        cantidad= Request.QueryString["result"];
-        if (cantidad!=null) 
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Result", "alert('Se agrego el articulo')", true);
-        
-    }
-
-    protected void btFiltNombre_Click(object sender, EventArgs e)
-    {
-        string nombre = tbfiltNombre.Text;
-        if (nombre.Length > 0)
-            Response.Redirect("Inicio.aspx?nombre=" + nombre);
-        else
-            Response.Redirect("Inicio.aspx");
-    }
-    
-    protected void listarTabla(string dato, int accion)
-    {
-        string mainconn = @"Data Source=LAPTOP-N94K9UFB;Initial Catalog=Tarea2;Integrated Security=True";
-        SqlConnection sqlconn = new SqlConnection(mainconn);
-        if (accion == 0)
-        {
-            SqlCommand sqlcomm = new SqlCommand("[dbo].[filtrar_Nombre]", sqlconn);
-            sqlcomm.CommandType = CommandType.StoredProcedure;
-            sqlcomm.Parameters.AddWithValue("@InNombre", dato);
-            sqlconn.Open();
-            SqlDataAdapter sda = new SqlDataAdapter(sqlcomm);
-            DataTable dt = new DataTable();
-            sda.Fill(dt);
-            GridArticulos.DataSource = dt;
-            GridArticulos.DataBind();
-            sqlconn.Close();
-        }
-        else if (accion == 1)
-        { 
-            SqlCommand sqlcomm = new SqlCommand("[dbo].[Filtrar_Cantidad]", sqlconn);
-            sqlcomm.CommandType = CommandType.StoredProcedure;
-            sqlcomm.Parameters.AddWithValue("@InCantidad", int.Parse(dato));
-            sqlconn.Open();
-            SqlDataAdapter sda = new SqlDataAdapter(sqlcomm);
-            DataTable dt = new DataTable();
-            sda.Fill(dt);
-            GridArticulos.DataSource = dt;
-            GridArticulos.DataBind();
-            sqlconn.Close();
-        }
-        else if (accion == 2) 
-        {
-            SqlCommand sqlcomm = new SqlCommand("[dbo].[Filtrar_ClaseArticulo]", sqlconn);
-            sqlcomm.CommandType = CommandType.StoredProcedure;
-            sqlcomm.Parameters.AddWithValue("@InClaseArticulo", dato);
-            sqlconn.Open();
-            SqlDataAdapter sda = new SqlDataAdapter(sqlcomm);
-            DataTable dt = new DataTable();
-            sda.Fill(dt);
-            GridArticulos.DataSource = dt;
-            GridArticulos.DataBind();
-            sqlconn.Close();
-        }
-        else
-        {
-            SqlCommand sqlcomm = new SqlCommand("[dbo].[listar_Articulos]", sqlconn);
-            sqlcomm.CommandType = CommandType.StoredProcedure;
-            sqlconn.Open();
-            SqlDataAdapter sda = new SqlDataAdapter(sqlcomm);
-            DataTable dt = new DataTable();
-            sda.Fill(dt);
-            GridArticulos.DataSource = dt;
-            GridArticulos.DataBind();
-            sqlconn.Close();
+            cantidad = Request.QueryString["result"];
+            if (cantidad != null)
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "Result", "alert('Se agrego el articulo')", true);
         }
 
-    }
-
-    protected void cargarClaseArticulos()
-    {
-        string conxString = "Data Source=LAPTOP-N94K9UFB;Initial Catalog=Tarea2;Integrated Security=True";
-        string query = "listar_claseArticulos";
-        using (SqlConnection connection = new SqlConnection(conxString))
+        protected void listarTabla(string dato, int accion)
         {
-            SqlCommand cmd = new SqlCommand(query, connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-            connection.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            string mainconn = @"Data Source=database-wanderaaron.cdspvapyouvj.us-east-2.rds.amazonaws.com,1433;Initial Catalog=Tarea#2;
+                                User ID=admin;
+                                Password=Wanderjose2"; // Se establece conexion
+
+            SqlConnection sqlconn = new SqlConnection(mainconn);
+            SqlCommand sqlcomm;
+
+            if (accion == 0)
             {
-                string nombre = reader["Nombre"].ToString();
-                DdClaseList.Items.Add(nombre);
+                sqlcomm = new SqlCommand("[dbo].[filtrar_Nombre]", sqlconn);
+                sqlcomm.CommandType = CommandType.StoredProcedure;
+                sqlcomm.Parameters.AddWithValue("@InNombre", dato); // Se filtra por nombre
+            }
+            else if (accion == 1)
+            {
+                sqlcomm = new SqlCommand("[dbo].[Filtrar_Cantidad]", sqlconn);
+                sqlcomm.CommandType = CommandType.StoredProcedure;
+                sqlcomm.Parameters.AddWithValue("@InCantidad", int.Parse(dato)); // Se filtra por cantidad
+            }
+            else if (accion == 2)
+            {
+                sqlcomm = new SqlCommand("[dbo].[Filtrar_ClaseArticulo]", sqlconn);
+                sqlcomm.CommandType = CommandType.StoredProcedure;
+                sqlcomm.Parameters.AddWithValue("@InClaseArticulo", dato); // Se filtra por clase
+            }
+            else
+            {
+                sqlcomm = new SqlCommand("[dbo].[listar_Articulos]", sqlconn);
+                sqlcomm.CommandType = CommandType.StoredProcedure; // Si no se filtra, entonces muestra los datos
+            }
+            if (accion < 3)
+            {
+                sqlcomm.Parameters.AddWithValue("@InIp", Request.UserHostAddress);
+                sqlcomm.Parameters.AddWithValue("@InUsuarios", Usuario);
+            }
+            sqlconn.Open();
+            SqlDataAdapter sda = new SqlDataAdapter(sqlcomm);
+            DataTable dt = new DataTable();
+            sda.Fill(dt);
+            GridArticulos.DataSource = dt; // Se rellena el grid con los datos, segun la accion tomada
+            GridArticulos.DataBind();
+            sqlconn.Close();
+        }
+
+        protected void cargarClaseArticulos()
+        {
+            string mainconn = @"Data Source=database-wanderaaron.cdspvapyouvj.us-east-2.rds.amazonaws.com,1433;
+                                Initial Catalog=Tarea#2;
+                                User ID=admin;
+                                Password=Wanderjose2"; // Se establece conexion
+
+            SqlConnection sqlconn = new SqlConnection(mainconn);
+            SqlCommand sqlcomm = new SqlCommand("listar_claseArticulos", sqlconn); // Se prepara para ejecutar el SP
+            sqlcomm.CommandType = CommandType.StoredProcedure;
+            sqlconn.Open();
+            SqlDataReader reader = sqlcomm.ExecuteReader();
+            while (reader.Read()) // Mientras que se puede leer
+            {
+                string nombre = reader["Nombre"].ToString(); // Se guarda el nombre
+                DdClaseList.Items.Add(nombre); // Se agrega a las opciones
             }
             reader.Close();
             reader.Dispose();
-            connection.Close();
+            sqlconn.Close();
         }
-    }
 
-    protected void btSalir1_Click(object sender, EventArgs e)
-    {
-        string cantidad = tbfiltCant.Text;
-        if (Regex.IsMatch(cantidad, @"\d") && int.Parse(cantidad) >= 0)
-            Response.Redirect("Inicio.aspx?cantidad=" + cantidad);
-        else if (cantidad== "")
+        protected void btFiltCant_Click(object sender, EventArgs e)
         {
-            Response.Redirect("Inicio.aspx");
-        }
-        else
-        {
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "err_Cant", "alert('Tienes que introducir un numero entero')", true);
-        }
-    }
-    protected void btFiltClase_Click(object sender, EventArgs e)
-    {
-        string clase = DdClaseList.SelectedValue;
-        Response.Redirect("Inicio.aspx?clase=" + clase);
-    }
+            string cantidad = tbfiltCant.Text; // Se recibe la cantidad puesta en la caja
 
-    protected void btInsertar_Click(object sender, EventArgs e)
-    {
-        Response.Redirect("InsertarArtic.aspx");
+            if (Regex.IsMatch(cantidad, @"\d") && int.Parse(cantidad) >= 0) // Si la cantidad es un valor valido
+            {
+                Response.Redirect("Inicio.aspx?usuario="+Usuario+"&cantidad=" + cantidad); // Redirige con el valor de cantidad
+            }  
+            else if (cantidad == "") // Si no se coloca valor
+            {
+                Response.Redirect("Inicio.aspx"); // Redirige con todos los datos
+            }
+            else
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "err_Cant", "alert('Tienes que introducir un numero entero')", true); // Error si la cantidad no es valida
+            }
+        }
+
+        protected void btFiltNombre_Click(object sender, EventArgs e)
+        {
+            string nombre = tbfiltNombre.Text; // Se obtiene lo que se escribio en el texto
+            if (nombre.Length > 0)
+                Response.Redirect("Inicio.aspx?usuario="+Usuario+"&nombre=" + nombre); // Si no esta vacia se filtra
+            else
+                Response.Redirect("Inicio.aspx"); // Si esta vacia se despliega todo
+        }
+
+        protected void btFiltClase_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("Inicio.aspx?usuario="+Usuario+"&clase=" + DdClaseList.SelectedValue); // Filtra por la opcion de la caja
+        }
+
+        protected void btInsertar_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("InsertarArtic.aspx?usuario="+Usuario); // Me redirige a la pagina de insertar
+        }
+
+        protected void btSalir_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("IniciarSesion.aspx"); // Me redirige a la pagina de usuario
+        }
     }
 }
